@@ -18,6 +18,8 @@ public:
 	void Union(int, int); // can add a value with no connectsion by passing same val to both args.
 	bool Connected(int, int) const;
 	int Find(int) const;
+
+	void Reset() { mRoots = std::map<int,int>(); mInverseRoots = std::multimap<int,int>(); }
 };
 
 } /* namespace mabz */

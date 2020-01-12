@@ -110,4 +110,25 @@ TEST(UnionFindTest, TestFindShouldThrow)
 	ASSERT_THROW(uf.Find(7), std::exception);
 }
 
+TEST(UnionFindTest, TestReset)
+{
+	mabz::UnionFind uf;
+	uf.Union(1, 2);
+	uf.Union(3, 4);
+	uf.Union(3, 4);
+	uf.Union(3, 5);
+	uf.Union(6, 7);
+	uf.Union(7, 8);
+
+	EXPECT_TRUE(uf.Connected(1, 2));
+	EXPECT_TRUE(uf.Connected(6, 8));
+	uf.Reset();
+	ASSERT_THROW(uf.Connected(1, 2), std::exception);
+	ASSERT_THROW(uf.Connected(6, 8), std::exception);
+
+	uf.Union(1, 2);
+	uf.Union(2, 4);
+	EXPECT_TRUE(uf.Connected(1, 4));
+}
+
 } /* anonymous namespace */

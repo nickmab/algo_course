@@ -1,121 +1,75 @@
 #include <algorithm>
 #include <exception>
 #include <limits>
+#include <set>
 #include <sstream>
+#include <vector>
 
 #include "algo_lib/union_find.h"
 
 namespace mabz {
 
+void UnionFind::CheckArrayBounds(int i) const
+{
+	if (i < 0 || i >= mCapacity)
+	{
+		std::stringstream err;
+		err << "Index out of bounds! Must be [0, " << mCapacity << "). "
+			<< "Instead got " << i << ".";
+		throw std::exception(err.str().c_str());
+	}
+}
+
+int UnionFind::GetRoot(int i) const
+{
+	int ultimateRoot{mRoots[i]};
+	while (ultimateRoot != mRoots[ultimateRoot])
+	{
+		ultimateRoot = mRoots[ultimateRoot];
+	}
+	return ultimateRoot;
+}
+
 void UnionFind::Union(int a, int b)
 {
-	auto aIt = mRoots.find(a);
-	auto bIt = mRoots.find(b);
-	const auto end = mRoots.end();
+	CheckArrayBounds(a);
+	CheckArrayBounds(b);
 
-	if (aIt == end)
+	const int rootOfA{GetRoot(a)};
+	const int rootOfB{GetRoot(b)};
+
+	if (rootOfA == rootOfB) return;
+
+	// link the root of the smaller tree to the root of the larger tree
+	if (mTreeSizes[rootOfA] > mTreeSizes[rootOfB])
 	{
-		if (bIt == end)
-		{
-			// neither exists yet; make one the other's root.
-			mRoots[a] = b;
-			mInverseRoots.insert(std::make_pair(b, a));
-			
-			if (a != b)
-			{
-				mRoots[b] = b; // make b its own root here
-				mInverseRoots.insert(std::make_pair(b, b));
-			}
-		}
-		else
-		{
-			// b exists and a does not; make a's root the same as b's.
-			const int rootOfB = bIt->second;
-			mRoots[a] = rootOfB;
-			mInverseRoots.insert(std::make_pair(rootOfB, a));
-		}
+		mRoots[rootOfB] = rootOfA;
+		mTreeSizes[rootOfA] += mTreeSizes[rootOfB];
 	}
 	else
 	{
-		if (bIt == end)
-		{
-			//a exists and b does not; make b's root the same as a's 
-			const int rootOfA = aIt->second;
-			mRoots[b] = rootOfA;
-			mInverseRoots.insert(std::make_pair(rootOfA, b));
-		}
-		else
-		{
-			// both exist; make a's root the same as b's (unless they're already the same!)
-			const int rootOfA = aIt->second;
-			const int rootOfB = bIt->second;
-
-			if (rootOfA	!= rootOfB)
-			{
-				mRoots[a] = rootOfB;
-				mInverseRoots.insert(std::make_pair(rootOfB, a));
-
-				auto range = mInverseRoots.equal_range(rootOfA);
-				for (auto currChildOfA = range.first; currChildOfA != range.second; /* do not it++ here */)
-				{
-					mRoots[currChildOfA->second] = rootOfB;
-					mInverseRoots.insert(std::make_pair(rootOfB, currChildOfA->second));
-					// deletion has the effect of advancing the iterator.
-					currChildOfA = mInverseRoots.erase(currChildOfA);
-				}
-			}
-		}
+		mRoots[rootOfA] = rootOfB;
+		mTreeSizes[rootOfB] += mTreeSizes[rootOfA];
 	}
 }
 
 bool UnionFind::Connected(int a, int b) const
 {
-	auto aIt = mRoots.find(a);
-	auto bIt = mRoots.find(b);
-	const auto end = mRoots.end();
+	CheckArrayBounds(a);
+	CheckArrayBounds(b);
+
+	const int rootOfA{GetRoot(a)};
+	const int rootOfB{GetRoot(b)};
 	
-	if (aIt == end)
-	{
-		std::stringstream err;
-		err << "Tried to see whether value \"" << a << "\" was connected to value \"" 
-			<< b << "\", but \"" << a << "\" does not even exist in the union!";
-		throw std::exception(err.str().c_str());
-	}
-	else if (bIt == end)
-	{
-		std::stringstream err;
-		err << "Tried to see whether value \"" << a << "\" was connected to value \"" 
-			<< b << "\", but \"" << a << "\" does not even exist in the union!";
-		throw std::exception(err.str().c_str());
-	}
-	else
-	{
-		return aIt->second == bIt->second;
-	}
+	return rootOfA == rootOfB;
 }
 
 int UnionFind::Find(int a) const
 {
-	auto aIt = mRoots.find(a);
-	const auto end = mRoots.end();
-	
-	if (aIt == end)
-	{
-		std::stringstream err;
-		err << "Tried to find value \"" << a << "\" in the union, but it's not there!";
-		throw std::exception(err.str().c_str());
-	}
-	else
-	{
-		int maxFound = std::numeric_limits<int>::min();
-		auto range = mInverseRoots.equal_range(aIt->second);
-		for (auto aRelative = range.first; aRelative != range.second; ++aRelative)
-		{
-			maxFound = std::max(maxFound, aRelative->second);
-		}
+	CheckArrayBounds(a);
 
-		return maxFound;
-	}
+	// not implemented
+	return 0;
 }
 
 } /* namespace mabz */

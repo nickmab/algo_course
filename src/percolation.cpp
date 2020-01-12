@@ -1,7 +1,7 @@
-#include <chrono>
+#include <algorithm>
 #include <cmath>
-#include <cstdlib> // rand
 #include <iostream>
+#include <random>
 #include <sstream>
 #include <vector>
 
@@ -14,24 +14,12 @@ void Percolation::CreateNewConnections(int row, int col)
 	// we assume here that the cell at this row,col address is freshly opened.
 	const int idx = 1 + mN * (row-1) + (col-1);
 
-	// important that when we call Union, we make the freshly opened one the 
-	// first argument, as it will currently not be the root of anything.
-	// (otherwise the Union function would go and needlessly change lots of roots under the hood).
-
 	// cell immediately to the left...
 	if (col > 1) 
 	{
 		if (mGrid[idx-1])
 		{
-			if (IsFull(row, col-1))
-			{
-				mConnections.Union(idx, 0);
-				return;
-			}
-			else
-			{
-				mConnections.Union(idx, idx-1);
-			}
+			mConnections.Union(idx, idx-1);
 		}
 	}
 	// cell immediately to the right...
@@ -39,15 +27,7 @@ void Percolation::CreateNewConnections(int row, int col)
 	{
 		if (mGrid[idx+1])
 		{
-			if (IsFull(row, col+1))
-			{
-				mConnections.Union(idx, 0);
-				return;
-			}
-			else
-			{
-				mConnections.Union(idx, idx+1);
-			}
+			mConnections.Union(idx, idx+1);
 		}
 	}
 	// cell immediately above...
@@ -55,15 +35,7 @@ void Percolation::CreateNewConnections(int row, int col)
 	{
 		if (mGrid[idx-mN])
 		{
-			if (IsFull(row-1, col))
-			{
-				mConnections.Union(idx, 0);
-				return;
-			}
-			else
-			{
-				mConnections.Union(idx, idx-mN);
-			}
+			mConnections.Union(idx, idx-mN);
 		}
 	}
 	else
@@ -76,15 +48,7 @@ void Percolation::CreateNewConnections(int row, int col)
 	{
 		if (mGrid[idx+mN])
 		{
-			if (IsFull(row+1, col))
-			{
-				mConnections.Union(idx, 0);
-				return;
-			}
-			else
-			{
-				mConnections.Union(idx, idx+mN);
-			}
+			mConnections.Union(idx, idx+mN);
 		}
 	}
 	else
@@ -111,7 +75,8 @@ void Percolation::CheckRowColBounds(int row, int col) const
 }
 
 Percolation::Percolation(int n) 
-	: mN(n)
+	: mConnections(n*n + 2)
+	, mN(n)
 	, mGrid(n*n + 2, false)
 {
 	if (n <= 0)
@@ -133,7 +98,7 @@ void Percolation::ResetGrid()
 	const auto gridSize = mGrid.size();
 	for (int i = 0; i < gridSize; ++i)
 	{
-		mConnections.Union(i, i);
+		mGrid[i] = false;
 	}
 }
 
@@ -154,7 +119,7 @@ bool Percolation::IsOpen(int row, int col) const
 	return mGrid[1 + mN * (row-1) + (col-1)]; 
 }
 
-bool Percolation::IsFull(int row, int col) const 
+bool Percolation::IsFull(int row, int col) const
 { 
 	CheckRowColBounds(row, col);
 	return mConnections.Connected(0, 1 + mN * (row-1) + (col-1));
@@ -191,8 +156,7 @@ PercolationStats::PercolationStats(int n, int trials)
 	std::vector<double> percolationThresholds(trials);
 	double percolationThresholdCumSum{0};
 	
-	auto millisInOpen{0};
-	auto millisInDoesPercolate{0};
+	auto randEng = std::default_random_engine{};
 
 	// First we generate all the random trials...
 	for (int i = 0; i < trials; i++)
@@ -210,42 +174,25 @@ PercolationStats::PercolationStats(int n, int trials)
 			}
 		}
 
-		for (int iterCount = 1; ; iterCount++)
-		{
-			// randomly select a cell to open from the ones that are still closed...
-			int idxToPop = rand() % remainingClosedRowColPairs.size();
-			std::pair<int,int> rowColToOpen = remainingClosedRowColPairs[idxToPop];
-			remainingClosedRowColPairs.erase(remainingClosedRowColPairs.begin() + idxToPop);
+		// shuffle randomly
+		std::shuffle(std::begin(remainingClosedRowColPairs), std::end(remainingClosedRowColPairs), randEng);
 
+		int iterCount = 1;
+		for (auto& rowColToOpen : remainingClosedRowColPairs)
+		{
 			// open that cell, see whether we've got a percolating grid or not...
-			auto beginTime = std::chrono::steady_clock::now();
 			percolation.Open(rowColToOpen.first, rowColToOpen.second);
-			auto endTime = std::chrono::steady_clock::now();
-			auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
-			millisInOpen += millis;
-			
-			beginTime = std::chrono::steady_clock::now();
 			if (percolation.DoesPercolate())
 			{
 				const double breakthroughRatio = static_cast<double>(iterCount) / nSquared;
 				percolationThresholds[i] = breakthroughRatio;
 				percolationThresholdCumSum += breakthroughRatio;
-				endTime = std::chrono::steady_clock::now();
-				millis = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
-				millisInDoesPercolate += millis;
 				break;
 			}
-			else
-			{
-				endTime = std::chrono::steady_clock::now();
-				millis = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
-				millisInDoesPercolate += millis;
-			}
+
+			iterCount++;
 		}
 	}
-
-	std::cout << "Millis in Open: " << millisInOpen << std::endl;
-	std::cout << "Millis in DoesPercolate: " << millisInDoesPercolate << std::endl;
 
 	// Now we calculate the statistics
 	mMean = percolationThresholdCumSum / trials;

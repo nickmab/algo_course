@@ -15,7 +15,7 @@ private:
 
 public:
     explicit IllegalArgumentException(const std::string& msg) : mMsg(msg) {}
-    virtual const char* what() const throw() override { return mMsg.c_str(); }
+    virtual const char* what() const override { return mMsg.c_str(); }
 };
 
 class Percolation

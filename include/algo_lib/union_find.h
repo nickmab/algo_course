@@ -1,25 +1,45 @@
 #pragma once
 
-#include <map>
-
 namespace mabz {
 
 class UnionFind
 {
 private:
-	// the number at key "i" is the index/number of the number i's root. 
-	std::map<int,int> mRoots;
+	int mCapacity;
+	// Integer array. The number at position "i" is the index/number of the number i's root. 
+	int* mRoots{nullptr};
+	// keep track of the number of nodes in the tree rooted at index "i".
+	int* mTreeSizes{nullptr};
 
-	// the number at key "i" is the root and the values are numbers that connect to that root.
-	// thus can have multiple keys of the same value.
-	std::multimap<int,int> mInverseRoots;
+	void CheckArrayBounds(int) const;
+	int GetRoot(int) const;
 
 public:
-	void Union(int, int); // can add a value with no connectsion by passing same val to both args.
+	UnionFind(int capacity) 
+		: mCapacity(capacity)
+		, mRoots(new int[capacity]())
+		, mTreeSizes(new int[capacity]())
+	{ 
+		Reset(); 
+	}
+
+	void Reset() 
+	{ 
+		for (int i = 0; i < mCapacity; i++) 
+		{
+			mRoots[i] = i;
+			mTreeSizes[i] = 1;
+		}
+	}
+	~UnionFind() { delete[] mRoots; delete[] mTreeSizes; } 
+	
+	UnionFind() = delete;
+	UnionFind(const UnionFind&) = delete;
+	UnionFind(UnionFind&&) = delete;
+
+	void Union(int, int);
 	bool Connected(int, int) const;
 	int Find(int) const;
-
-	void Reset() { mRoots = std::map<int,int>(); mInverseRoots = std::multimap<int,int>(); }
 };
 
 } /* namespace mabz */

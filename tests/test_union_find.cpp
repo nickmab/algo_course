@@ -5,16 +5,7 @@
 
 namespace {
 
-class UnionFindTest : public testing::Test 
-{
-private:
-	// nothing yet.	
-
-public:
-	// nothing yet.
-};
-
-TEST_F(UnionFindTest, TestConnected)
+TEST(UnionFindTest, TestConnected)
 {
 	mabz::UnionFind uf;
 	uf.Union(1, 2);
@@ -60,7 +51,7 @@ TEST_F(UnionFindTest, TestConnected)
 	EXPECT_FALSE(uf.Connected(5, 8));
 }
 
-TEST_F(UnionFindTest, TestFind)
+TEST(UnionFindTest, TestFind)
 {
 	mabz::UnionFind uf;
 	uf.Union(1, 2);
@@ -80,7 +71,26 @@ TEST_F(UnionFindTest, TestFind)
 	EXPECT_EQ(uf.Find(8), 8);
 }
 
-TEST_F(UnionFindTest, TestConnectedShouldThrow)
+TEST(UnionFindTest, TestUnionToSelf)
+{
+	mabz::UnionFind uf;
+	uf.Union(1, 1);
+	uf.Union(2, 2);
+	uf.Union(3, 3);
+	uf.Union(2, 2);
+	uf.Union(2, 3);
+
+	EXPECT_TRUE(uf.Connected(1, 1));
+	EXPECT_TRUE(uf.Connected(2, 3));
+	EXPECT_TRUE(uf.Connected(3, 2));
+	
+	EXPECT_FALSE(uf.Connected(1, 2));
+	EXPECT_FALSE(uf.Connected(1, 3));
+	EXPECT_FALSE(uf.Connected(2, 1));
+	EXPECT_FALSE(uf.Connected(3, 1));
+}
+
+TEST(UnionFindTest, TestConnectedShouldThrow)
 {
 	mabz::UnionFind uf;
 	uf.Union(1, 2);
@@ -91,7 +101,7 @@ TEST_F(UnionFindTest, TestConnectedShouldThrow)
 	ASSERT_THROW(uf.Connected(1, 3), std::exception);
 }
 
-TEST_F(UnionFindTest, TestFindShouldThrow)
+TEST(UnionFindTest, TestFindShouldThrow)
 {
 	mabz::UnionFind uf;
 	uf.Union(1, 2);

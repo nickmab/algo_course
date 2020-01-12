@@ -19,9 +19,13 @@ void UnionFind::Union(int a, int b)
 		{
 			// neither exists yet; make one the other's root.
 			mRoots[a] = b;
-			mRoots[b] = b; // make b its own root here
 			mInverseRoots.insert(std::make_pair(b, a));
-			mInverseRoots.insert(std::make_pair(b, b));
+			
+			if (a != b)
+			{
+				mRoots[b] = b; // make b its own root here
+				mInverseRoots.insert(std::make_pair(b, b));
+			}
 		}
 		else
 		{

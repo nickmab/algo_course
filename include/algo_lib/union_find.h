@@ -15,7 +15,7 @@ private:
 	std::multimap<int,int> mInverseRoots;
 
 public:
-	void Union(int, int);
+	void Union(int, int); // can add a value with no connectsion by passing same val to both args.
 	bool Connected(int, int) const;
 	int Find(int) const;
 };

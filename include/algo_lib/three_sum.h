@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -9,28 +10,31 @@
 
 namespace mabz { namespace search {
 
-template <typename T>
+template <typename T, typename Container>
 class ThreeSum
 {
+public:
 	template <typename T>
-	class Triplet
+	struct Triplet
 	{
 		T first;
 		T second;
 		T third;
+		Triplet(T a, T b, T c) : first(a), second(b), third(c) {}
 	};
 
 private:
 	T mTargetSum;
 	// for use in binary search and checking whether the triplet sum is equal to the desired val.
 	// defaults to using the == operator if unspecified.
-	bool (*mEqualityFunction)(T, T){nullptr};
-	std::vector<T> mSortedInputs;
+	typedef std::function<bool(T,T)> CMPFunc;
+	CMPFunc mEqualityFunction;
+	Container mSortedInputs;
 	std::vector<Triplet<T> > mResults;
 	bool mDone;
 
 public:
-	ThreeSum(T targetSum, const std::vector<T>& inputs, bool(*eqFunc)(T, T)=nullptr);
+	ThreeSum(T targetSum, const Container& inputs, CMPFunc eqFunc=CMPFunc{nullptr});
 	
 	void Run();
 	bool IsDone() const { return mDone; }
@@ -47,8 +51,8 @@ public:
 	}
 };
 
-template <typename T>
-ThreeSum<T>::ThreeSum(T targetSum, const std::vector<T>& inputs, bool(*eqFunc)(T, T))
+template <typename T, typename Container>
+ThreeSum<T,Container>::ThreeSum(T targetSum, const Container& inputs, CMPFunc eqFunc)
 	: mTargetSum(targetSum)
 	, mEqualityFunction(eqFunc)
 	, mSortedInputs(inputs)
@@ -57,26 +61,38 @@ ThreeSum<T>::ThreeSum(T targetSum, const std::vector<T>& inputs, bool(*eqFunc)(T
 	std::sort(mSortedInputs.begin(), mSortedInputs.end());
 }
 
-template <typename T>
-void ThreeSum<T>::Run()
+template <typename T, typename Container>
+void ThreeSum<T,Container>::Run()
 {
+	if (mDone) throw "Tried to call Run more than once!";
+
+	const int n = mSortedInputs.size();
+
+	std::function<int(T,int)> binSearchCallback;
 	if (mEqualityFunction)
 	{
-		std::cout << BinSearch(mSortedInputs[0], mSortedInputs, 0, mSortedInputs.size()-1, mEqualityFunction) << std::endl;
-		std::cout << BinSearch(mSortedInputs[1], mSortedInputs, 0, mSortedInputs.size()-1, mEqualityFunction) << std::endl;
-		std::cout << BinSearch(mSortedInputs[1], mSortedInputs, 2, mSortedInputs.size()-1, mEqualityFunction) << std::endl;
-		std::cout << BinSearch(mSortedInputs[mSortedInputs.size()-1], mSortedInputs, 2, mSortedInputs.size()-1, mEqualityFunction) << std::endl;
-		std::cout << BinSearch(mSortedInputs[0] + 99999, mSortedInputs, 0, mSortedInputs.size()-1, mEqualityFunction) << std::endl;
-		std::cout << BinSearch(mSortedInputs[0] + 99999, mSortedInputs, 0, mSortedInputs.size()-1, mEqualityFunction) << std::endl;
+		binSearchCallback = [&](T lookFor, int startIdx) ->int { 
+			return BinSearch(lookFor, mSortedInputs, startIdx, n-1, mEqualityFunction); 
+		};
 	}
 	else
 	{
-		std::cout << BinSearch(mSortedInputs[0], mSortedInputs, 0, mSortedInputs.size()-1) << std::endl;
-		std::cout << BinSearch(mSortedInputs[1], mSortedInputs, 0, mSortedInputs.size()-1) << std::endl;
-		std::cout << BinSearch(mSortedInputs[1], mSortedInputs, 2, mSortedInputs.size()-1) << std::endl;
-		std::cout << BinSearch(mSortedInputs[mSortedInputs.size()-1], mSortedInputs, 2, mSortedInputs.size()-1) << std::endl;
-		std::cout << BinSearch(mSortedInputs[0] + 99999, mSortedInputs, 0, mSortedInputs.size()-1) << std::endl;
-		std::cout << BinSearch(mSortedInputs[0] + 99999, mSortedInputs, 0, mSortedInputs.size()-1) << std::endl;	
+		binSearchCallback = [&](T lookFor, int startIdx) ->int { 
+			return BinSearch(lookFor, mSortedInputs, startIdx, n-1); 
+		};
+	}
+
+	for (int i = 0; i < (n-2); i++)
+	{
+		for (int j = i+1; j < (n-1); j++)
+		{
+			const T thirdValueRequired = mTargetSum - mSortedInputs[i] - mSortedInputs[j];
+			const int resultIdxOrMinusOne = binSearchCallback(thirdValueRequired, j+1);
+			if (resultIdxOrMinusOne != -1)
+			{
+				mResults.emplace_back(mSortedInputs[i], mSortedInputs[j], mSortedInputs[resultIdxOrMinusOne]);
+			}
+		}
 	}
 
 	mDone = true;

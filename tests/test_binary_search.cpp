@@ -1,5 +1,6 @@
 #include <cmath>
 #include <exception>
+#include <functional>
 #include <vector>
 #include <array>
 
@@ -20,6 +21,7 @@ TEST(BinSearchTest, TestDefaultCase)
 	ASSERT_EQ(nssearch::BinSearch(8, v, 1, 5), 5);
 	ASSERT_EQ(nssearch::BinSearch(8, v, 1, 4), -1);
 	ASSERT_EQ(nssearch::BinSearch(9, v, 0, 5), -1);
+	ASSERT_EQ(nssearch::BinSearch(3, v, 2, 2), 2);
 }
 
 TEST(BinSearchTest, TestWorksWithArray)
@@ -36,7 +38,7 @@ TEST(BinSearchTest, TestWorksWithArray)
 TEST(BinSearchTest, TestCustomComparisonWithDoubles)
 {
 	std::array<double, 4> a{1, 2, 3, 6};
-	bool (*func)(double, double) = [](double a, double b) ->bool {
+	std::function<bool(double,double)> func = [](double a, double b) ->bool {
 		return abs(a-b) < 0.1;
 	};
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <exception>
+#include <functional>
 #include <sstream>
 #include <string>
 
@@ -22,13 +23,13 @@ public:
 // to using == operator. Return -1 if not found.
 template <typename T, typename Container>
 int BinSearch(const T& target, const Container& cont, int begin, int end,
-	bool(*eqFunc)(T, T)=[](T a, T b)->bool{ return a == b; })
+	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
 {
-	if (end <= begin || begin < 0 || end >= cont.size())
+	if (end < begin || begin < 0 || end >= cont.size())
 	{
 		std::stringstream err;
 		err << "Attempted to call BinSearch with illegal arguments. " << std::endl
-		    << "end must be greater than begin, begin and end must be within the "
+		    << "end must be >= begin, begin and end must be within the "
 		    << "valid range 0-" << cont.size()-1 << " for the provided container. " << std::endl
 		    << "Got begin(" << begin << ") and end(" << end << ").";
 		throw IndexOutOfRange(err.str());

@@ -64,12 +64,4 @@ bool UnionFind::Connected(int a, int b) const
 	return rootOfA == rootOfB;
 }
 
-int UnionFind::Find(int a) const
-{
-	CheckArrayBounds(a);
-
-	// not implemented
-	return 0;
-}
-
 } /* namespace mabz */

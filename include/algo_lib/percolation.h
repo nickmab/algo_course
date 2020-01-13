@@ -62,8 +62,6 @@ public:
     // does the system percolate? 
     // true if there is a full site in the bottom row.
     bool DoesPercolate() const;
-
-    int GetN() const { return mN; }
 };
 
 class PercolationStats 

@@ -51,26 +51,6 @@ TEST(UnionFindTest, TestConnected)
 	EXPECT_FALSE(uf.Connected(5, 8));
 }
 
-// TEST(UnionFindTest, TestFind)
-// {
-// 	mabz::UnionFind uf(9);
-// 	uf.Union(1, 2);
-// 	uf.Union(3, 4);
-// 	uf.Union(3, 4);
-// 	uf.Union(3, 5);
-// 	uf.Union(6, 7);
-// 	uf.Union(7, 8);
-
-// 	EXPECT_EQ(uf.Find(1), 2);
-// 	EXPECT_EQ(uf.Find(2), 2);
-// 	EXPECT_EQ(uf.Find(3), 5);
-// 	EXPECT_EQ(uf.Find(4), 5);
-// 	EXPECT_EQ(uf.Find(5), 5);
-// 	EXPECT_EQ(uf.Find(6), 8);
-// 	EXPECT_EQ(uf.Find(7), 8);
-// 	EXPECT_EQ(uf.Find(8), 8);
-// }
-
 TEST(UnionFindTest, TestUnionToSelf)
 {
 	mabz::UnionFind uf(4);
@@ -99,15 +79,6 @@ TEST(UnionFindTest, TestConnectedShouldThrow)
 	ASSERT_THROW(uf.Connected(-1, 1), std::exception);
 	// look for out of bounds value 3
 	ASSERT_THROW(uf.Connected(1, 3), std::exception);
-}
-
-TEST(UnionFindTest, TestFindShouldThrow)
-{
-	mabz::UnionFind uf(3);
-	uf.Union(1, 2);
-
-	// look for out of bounds value 7
-	ASSERT_THROW(uf.Find(7), std::exception);
 }
 
 TEST(UnionFindTest, TestReset)

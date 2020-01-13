@@ -31,7 +31,11 @@ public:
 			mTreeSizes[i] = 1;
 		}
 	}
-	~UnionFind() { delete[] mRoots; delete[] mTreeSizes; } 
+	~UnionFind() 
+	{ 
+		delete[] mRoots; 
+		delete[] mTreeSizes; 
+	} 
 	
 	UnionFind() = delete;
 	UnionFind(const UnionFind&) = delete;
@@ -39,7 +43,6 @@ public:
 
 	void Union(int, int);
 	bool Connected(int, int) const;
-	int Find(int) const;
 };
 
 } /* namespace mabz */

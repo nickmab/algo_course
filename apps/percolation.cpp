@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 
 		return 0;
 	}
-	catch (const mabz::percolation::IllegalArgumentException& ex)
+	catch (const mabz::IllegalArgumentException& ex)
 	{
 		std::cerr << "Attempted to run percolation stats with illegal arguments: " << std::endl;
 		std::cerr << ex.what() << std::endl;

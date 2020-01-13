@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 
+#include "algo_lib/exceptions.h"
 #include "algo_lib/union_find.h"
 
 namespace mabz {
@@ -16,7 +17,7 @@ void UnionFind::CheckArrayBounds(int i) const
 		std::stringstream err;
 		err << "Index out of bounds! Must be [0, " << mCapacity << "). "
 			<< "Instead got " << i << ".";
-		throw std::exception(err.str().c_str());
+		throw IndexOutOfRange(err.str().c_str());
 	}
 }
 

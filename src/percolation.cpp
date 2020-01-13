@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 
+#include "algo_lib/exceptions.h"
 #include "algo_lib/percolation.h"
 
 namespace mabz { namespace percolation {
@@ -64,13 +65,13 @@ void Percolation::CheckRowColBounds(int row, int col) const
 	{
 		std::stringstream err;
 		err << "Row index must be between 1 and " << mN << " inclusive. Got " << row;
-		throw IllegalArgumentException(err.str());
+		throw mabz::IllegalArgumentException(err.str());
 	}
 	if (col < 1 || col > mN)
 	{
 		std::stringstream err;
 		err << "Col index must be between 1 and " << mN << " inclusive. Got " << col;
-		throw IllegalArgumentException(err.str());
+		throw mabz::IllegalArgumentException(err.str());
 	}
 }
 
@@ -83,7 +84,7 @@ Percolation::Percolation(int n)
 	{
 		std::stringstream err;
 		err << "Must construct Percolation class with n > 0. Instead got " << n;
-		throw IllegalArgumentException(err.str());
+		throw mabz::IllegalArgumentException(err.str());
 	}
 
 	ResetGrid();
@@ -147,7 +148,7 @@ PercolationStats::PercolationStats(int n, int trials)
 		std::stringstream err;
 		err << "Must construct PercolationStats with positive n and trials. "
 		    << "Instead, got n: " << n << " and trials: " << trials; 
-		throw IllegalArgumentException(err.str());
+		throw mabz::IllegalArgumentException(err.str());
 	}
 
 	std::cout << "Running percolation stats with n: " << n << " and trials: " << trials << std::endl;

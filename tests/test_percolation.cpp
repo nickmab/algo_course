@@ -10,19 +10,19 @@ TEST(PercolationTest, TestConstructorThrows)
 {
 	ASSERT_THROW(
 		[]() { nsperc::Percolation p(-5); }(), 
-		nsperc::IllegalArgumentException);
+		mabz::IllegalArgumentException);
 }
 
 TEST(PercolationFixtureless, TestMethodsThrow)
 {
 	nsperc::Percolation p(5);
 	
-	ASSERT_THROW(p.Open(0, 3), nsperc::IllegalArgumentException);
-	ASSERT_THROW(p.Open(1, 8), nsperc::IllegalArgumentException);
-	ASSERT_THROW(p.IsOpen(-2, 5), nsperc::IllegalArgumentException);
-	ASSERT_THROW(p.IsOpen(2, -5), nsperc::IllegalArgumentException);
-	ASSERT_THROW(p.IsFull(9, 1), nsperc::IllegalArgumentException);
-	ASSERT_THROW(p.IsFull(1, 9), nsperc::IllegalArgumentException);
+	ASSERT_THROW(p.Open(0, 3), mabz::IllegalArgumentException);
+	ASSERT_THROW(p.Open(1, 8), mabz::IllegalArgumentException);
+	ASSERT_THROW(p.IsOpen(-2, 5), mabz::IllegalArgumentException);
+	ASSERT_THROW(p.IsOpen(2, -5), mabz::IllegalArgumentException);
+	ASSERT_THROW(p.IsFull(9, 1), mabz::IllegalArgumentException);
+	ASSERT_THROW(p.IsFull(1, 9), mabz::IllegalArgumentException);
 }
 
 TEST(PercolationTest, TestNoPercolateCaseWithSomeOpenings)

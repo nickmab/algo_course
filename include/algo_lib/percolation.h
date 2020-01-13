@@ -4,19 +4,10 @@
 #include <string>
 #include <vector>
 
+#include <algo_lib/exceptions.h>
 #include <algo_lib/union_find.h>
 
 namespace mabz { namespace percolation {
-
-class IllegalArgumentException : public std::exception
-{
-private:
-    std::string mMsg;
-
-public:
-    explicit IllegalArgumentException(const std::string& msg) : mMsg(msg) {}
-    virtual const char* what() const override { return mMsg.c_str(); }
-};
 
 class Percolation
 {

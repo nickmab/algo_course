@@ -35,6 +35,18 @@ TEST(BinSearchTest, TestWorksWithArray)
 	ASSERT_EQ(nssearch::BinSearch(9, a, 0, 5), -1);
 }
 
+TEST(BinSearchTest, TestReverseSort)
+{
+	std::vector<int> v{8, 7, 6, 3, 2, 1};
+	ASSERT_EQ(nssearch::ReverseBinSearch(1, v, 0, 5), 5);
+	ASSERT_EQ(nssearch::ReverseBinSearch(1, v, 1, 5), 5);
+	ASSERT_EQ(nssearch::ReverseBinSearch(2, v, 0, 5), 4);
+	ASSERT_EQ(nssearch::ReverseBinSearch(8, v, 1, 5), -1);
+	ASSERT_EQ(nssearch::ReverseBinSearch(8, v, 0, 4), 0);
+	ASSERT_EQ(nssearch::ReverseBinSearch(9, v, 0, 5), -1);
+	ASSERT_EQ(nssearch::ReverseBinSearch(3, v, 3, 3), 3);
+}
+
 TEST(BinSearchTest, TestCustomComparisonWithDoubles)
 {
 	std::array<double, 4> a{1, 2, 3, 6};

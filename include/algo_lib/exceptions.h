@@ -24,6 +24,7 @@ public:
 CUSTOM(IndexOutOfRange)
 CUSTOM(IllegalArgumentException)
 CUSTOM(UnexpectedMethodCall)
+CUSTOM(Unreachable)
 
 #undef CUSTOM
 

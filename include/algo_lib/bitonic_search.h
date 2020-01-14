@@ -129,20 +129,134 @@ int BitonicSearch(const T& target, const Container& cont,
 	
 	if (turningPoint > 0)
 	{
-		result = BinSearch(target, cont, 0, turningPoint);
+		result = BinSearch(target, cont, 0, turningPoint, eqFunc);
 
 		// only need to keep searching if we didn't already find it!
 		if (result == -1 && turningPoint < uBound)
 		{
-			result = ReverseBinSearch(target, cont, turningPoint + 1, uBound);
+			result = ReverseBinSearch(target, cont, turningPoint + 1, uBound, eqFunc);
 		}
 	}
 	else
 	{
-		result = ReverseBinSearch(target, cont, 0, uBound);
+		result = ReverseBinSearch(target, cont, 0, uBound, eqFunc);
 	}
 	
 	return result;
+}
+
+// Same as Bitonic search, but without first looking for the turning point.
+template <typename T, typename Container>
+int BetterBitonicSearch(const T& target, const Container& cont,
+	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
+{
+	// find the index of the turning point
+	int begin = 0;
+	int end = cont.size()-1;	
+
+	for (;;)
+	{
+		int halfWay = (begin + end) / 2;
+		if (halfWay == begin)
+		{
+			// we are down to the last two elements.
+			if (eqFunc(target, cont[begin])) return begin;
+			if (eqFunc(target, cont[end])) return end;
+			return -1;
+		}
+		
+		const T halfWayVal = cont[halfWay];
+		if (eqFunc(target, halfWayVal)) return halfWay;
+
+		// peek left and right to determine which way to go next.
+		int iLeft = halfWay - 1;
+		int iRight = halfWay + 1;
+		for ( ; iLeft > begin && eqFunc(cont[iLeft], halfWayVal); --iLeft) {}
+		for ( ; iRight < end && eqFunc(cont[iRight], halfWayVal); ++iRight) {}
+		const T valLeft = cont[iLeft];
+		const T valRight = cont[iRight];
+
+		// we need to check the equality functions first, otherwise it might
+		// mess up a double comparison (for example) and start going the wrong way.
+		if (eqFunc(target, valLeft)) return iLeft;
+		if (eqFunc(target, valRight)) return iRight;
+		
+		if (target > halfWayVal)
+		{
+			if (valLeft > halfWayVal)
+			{
+				if (valRight > halfWayVal)
+				{
+					// we've found a lowpoint midpoint; this should be impossible.
+					std::stringstream err;
+					err << "Found higher values to both the right and right of index " << halfWay
+					    << "Value at idx: " << halfWayVal << " and vals to left and right: "
+					    << valLeft << ", " << valRight << ".";
+					throw mabz::IllegalArgumentException(err.str());
+				}
+				else
+				{
+					// just keep going left.
+					end = iLeft;
+				}
+			}
+			else
+			{
+				if (valRight > halfWayVal)
+				{
+					// just keep going right.
+					begin = iRight;
+				}
+				else
+				{
+					// our target is higher than the half way val we just checked,
+					// but the half way val happens to be the highest in the whole container.
+					return -1; 
+				}
+			}
+		}
+		else
+		{
+			if (valLeft < halfWayVal)
+			{
+				if (valRight < halfWayVal)
+				{
+					// we've found a maximum midpoint; simply binsearch both directions!
+					const int leftSearch = BinSearch(target, cont, begin, iLeft, eqFunc);
+					if (leftSearch != -1) return leftSearch;
+					return ReverseBinSearch(target, cont, iRight, end, eqFunc);
+				}
+				else
+				{
+					// just keep going left.
+					end = iLeft;
+				}
+			}
+			else
+			{
+				if (valRight < halfWayVal)
+				{
+					// just keep going right.
+					begin = iRight;
+				}
+				else
+				{
+					// our target is lower than the half way val we just checked,
+					// but the half way val happens to be the lowest in the whole container.
+					// This should be impossible!
+					std::stringstream err;
+					err << "Found higher values to both the right and right of index " << halfWay
+					    << "Value at idx: " << halfWayVal << " and vals to left and right: "
+					    << valLeft << ", " << valRight << ".";
+					throw mabz::IllegalArgumentException(err.str());
+				}
+			}
+		}
+	}
+
+	throw mabz::Unreachable("BetterBitonicSearch somehow escaped from an infinite loop.");
+	// just to stop the compiler from complaining that not all code paths return a value.
+	return -1;
 }
 
 } /* namespace search */

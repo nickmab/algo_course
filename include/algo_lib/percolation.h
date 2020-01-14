@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 
-#include <algo_lib/exceptions.h>
 #include <algo_lib/union_find.h>
 
 namespace mabz { namespace percolation {

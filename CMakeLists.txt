@@ -22,9 +22,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # since it calls enable_testing, which must be in the
     # main CMakeLists.
     include(CTest)
+    add_subdirectory(tests)
 
 endif()
 
 add_subdirectory(src)
 add_subdirectory(apps)
-add_subdirectory(tests)

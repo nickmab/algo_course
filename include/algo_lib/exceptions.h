@@ -15,16 +15,16 @@ public:
 	virtual const char* what() const override { return mMessage.c_str(); }
 };
 
-class IndexOutOfRange : public CustomException
-{
-public:
-	IndexOutOfRange(const std::string& msg) : CustomException(msg) {}
-};
+#define CUSTOM(name) \
+	struct name : public CustomException \
+	{ \
+		name(const std::string& msg) : CustomException(msg) {} \
+	};
 
-class IllegalArgumentException : public CustomException
-{
-public:
-    IllegalArgumentException(const std::string& msg) : CustomException(msg) {}
-};
+CUSTOM(IndexOutOfRange)
+CUSTOM(IllegalArgumentException)
+CUSTOM(UnexpectedMethodCall)
+
+#undef CUSTOM
 
 } /* namespace mabz */

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algo_lib/exceptions.h>
 #include <algo_lib/percolation.h>
 
 namespace {

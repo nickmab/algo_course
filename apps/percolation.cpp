@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 
+#include <algo_lib/exceptions.h>
 #include <algo_lib/percolation.h>
 
 void usage(const char* argv0, const std::string& error)

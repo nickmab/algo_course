@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <algo_lib/binary_search.h>
+#include <algo_lib/exceptions.h>
 
 namespace mabz { namespace search {
 
@@ -40,13 +41,13 @@ public:
 	bool IsDone() const { return mDone; }
 	int GetNumberOfTriplets() const 
 	{ 
-		if (!mDone) throw "Tried to call GetNumberOfTriplets before calling Run!";
+		if (!mDone) throw mabz::UnexpectedMethodCall("Tried to call GetNumberOfTriplets before calling Run!");
 		return mResults.size(); 
 	}
 	
 	std::vector<Triplet<T> > GetResults() const
 	{
-		if (!mDone) throw "Tried to call GetResults before calling Run!";
+		if (!mDone) throw mabz::UnexpectedMethodCall("Tried to call GetResults before calling Run!");
 		return mResults;
 	}
 };
@@ -64,7 +65,7 @@ ThreeSum<T,Container>::ThreeSum(T targetSum, const Container& inputs, CMPFunc eq
 template <typename T, typename Container>
 void ThreeSum<T,Container>::Run()
 {
-	if (mDone) throw "Tried to call Run more than once!";
+	if (mDone) throw mabz::UnexpectedMethodCall("Tried to call Run more than once!");
 
 	const int n = mSortedInputs.size();
 

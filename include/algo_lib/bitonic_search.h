@@ -150,7 +150,6 @@ template <typename T, typename Container>
 int BetterBitonicSearch(const T& target, const Container& cont,
 	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
 {
-	// find the index of the turning point
 	int begin = 0;
 	int end = cont.size()-1;	
 

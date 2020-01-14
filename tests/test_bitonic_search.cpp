@@ -114,7 +114,7 @@ TEST(BitonicSearchTest, TestDefaultCases)
 	// test when the values aren't there...
 	{
 		std::vector<int> v{2, 4, 3, 2, 1};
-		ASSERT_EQ(nssearch::BitonicSearch<int>(7, v), -1);
+		ASSERT_EQ(nssearch::BitonicSearch<int>(-2, v), -1);
 	}
 }
 
@@ -199,7 +199,7 @@ TEST(BetterBitonicSearchTest, TestDefaultCases)
 	// test when the values aren't there...
 	{
 		std::vector<int> v{2, 4, 3, 2, 1};
-		ASSERT_EQ(nssearch::BetterBitonicSearch<int>(7, v), -1);
+		ASSERT_EQ(nssearch::BetterBitonicSearch<int>(-2, v), -1);
 	}
 }
 

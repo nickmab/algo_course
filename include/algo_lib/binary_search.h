@@ -13,6 +13,7 @@ namespace mabz { namespace search {
 // container indices [begin, end] inclusive. Can optionally provide an equality 
 // comparison function (e.g. for comparing doubles), otherwise defaults 
 // to using == operator. Return -1 if not found.
+// Returns the left-most index (if there are multiple instances of the same value).
 template <typename T, typename Container>
 int BinSearch(const T& target, const Container& cont, int begin, int end,
 	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; },
@@ -27,6 +28,13 @@ int BinSearch(const T& target, const Container& cont, int begin, int end,
 		    << "Got begin(" << begin << ") and end(" << end << ").";
 		throw mabz::IndexOutOfRange(err.str());
 	}
+
+	// when we find a matching desired value, use this func to return the left-most
+	// instance of it. 
+	auto returnLeftmost = [&] (int idx) ->int {
+		while (idx > 0 && eqFunc(cont[idx], cont[idx-1])) --idx;
+		return idx;
+	};
 
 	std::function<bool(T,T)> cmpFunc;
 	if (reverseSorted)
@@ -44,24 +52,24 @@ int BinSearch(const T& target, const Container& cont, int begin, int end,
 		const T halfwayVal = cont[halfWay];
 		if (eqFunc(halfwayVal, target))
 		{
-			return halfWay;
+			return returnLeftmost(halfWay);
 		}
 		else if (cmpFunc(halfwayVal,  target))
 		{
-			if (eqFunc(cont[begin], target)) return begin;
+			if (eqFunc(cont[begin], target)) return returnLeftmost(begin);
 			if (halfWay == begin) break;
 			++begin;
 			end = halfWay;
 		}
 		else
 		{
-			if (eqFunc(cont[end], target)) return end;
+			if (eqFunc(cont[end], target)) return returnLeftmost(end);
 			--end;
 			begin = halfWay;
 		}
 	}
 
-	return eqFunc(cont[begin], target) ? begin : -1;
+	return eqFunc(cont[begin], target) ? returnLeftmost(begin) : -1;
 }
 
 // Wrapper for use with reverse-sorted containers if you don't want to bother 

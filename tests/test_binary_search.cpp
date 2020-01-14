@@ -47,6 +47,24 @@ TEST(BinSearchTest, TestReverseSort)
 	ASSERT_EQ(nssearch::ReverseBinSearch(3, v, 3, 3), 3);
 }
 
+TEST(BinSearchTest, TestReturnsLeftMost)
+{
+	{
+		std::vector<int> v{1, 2, 2, 6, 7, 7, 7, 7, 7, 7, 7, 9};
+		ASSERT_EQ(nssearch::BinSearch(2, v, 0, v.size()-1), 1);
+		ASSERT_EQ(nssearch::BinSearch(7, v, 0, v.size()-1), 4);
+	}
+
+	{
+		std::function<bool(double,double)> func = [](double a, double b) ->bool {
+			return abs(a-b) < 0.01;
+		};
+
+		std::vector<double> v{9, 8, 6.95, 6.9505, 6.9499, 6.95, 5};
+		ASSERT_EQ(nssearch::ReverseBinSearch(6.9508, v, 0, v.size()-1, func), 2);
+	}
+}
+
 TEST(BinSearchTest, TestCustomComparisonWithDoubles)
 {
 	std::array<double, 4> a{1, 2, 3, 6};

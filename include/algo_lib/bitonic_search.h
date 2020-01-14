@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -15,6 +16,7 @@ namespace mabz { namespace search {
 // Can optionally provide an equality comparison function 
 // (e.g. for comparing doubles), otherwise defaults to 
 // using == operator.
+// Returns the left-most index (if there are multiple equal highs).
 template <typename T, typename Container>
 int FindBitonicTurningPoint(const Container& cont,
 	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
@@ -109,6 +111,8 @@ AmbiguousDirection:
 		}
 	}
 
+	// by default we give back the left-most index (if there are multiple equal highs).
+	while (begin > 0 && eqFunc(cont[begin], cont[begin-1])) --begin;
 	return begin;
 }
 
@@ -119,6 +123,7 @@ AmbiguousDirection:
 // (e.g. for comparing doubles), otherwise defaults to 
 // using == operator. Return -1 if not found.
 // Also works if the entire container is monotonic increasing or decreasing.
+// Returns the left-most index (if there are multiple instances of the same value).
 template <typename T, typename Container>
 int BitonicSearch(const T& target, const Container& cont,
 	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
@@ -142,16 +147,26 @@ int BitonicSearch(const T& target, const Container& cont,
 		result = ReverseBinSearch(target, cont, 0, uBound, eqFunc);
 	}
 	
+	// Returns the left-most index (if there are multiple instances of the same value).
+	while (result > 0 && eqFunc(cont[result], cont[result-1])) --result;
 	return result;
 }
 
 // Same as Bitonic search, but without first looking for the turning point.
+// Returns the left-most index (if there are multiple instances of the same value).
 template <typename T, typename Container>
 int BetterBitonicSearch(const T& target, const Container& cont,
 	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
 {
 	int begin = 0;
 	int end = cont.size()-1;	
+
+	// when we find a matching desired value, use this func to return the left-most
+	// instance of it. 
+	auto returnLeftmost = [&] (int idx) ->int {
+		while (idx > 0 && eqFunc(cont[idx], cont[idx-1])) --idx;
+		return idx;
+	};
 
 	for (;;)
 	{
@@ -165,7 +180,7 @@ int BetterBitonicSearch(const T& target, const Container& cont,
 		}
 		
 		const T halfWayVal = cont[halfWay];
-		if (eqFunc(target, halfWayVal)) return halfWay;
+		if (eqFunc(target, halfWayVal)) return returnLeftmost(halfWay);
 
 		// peek left and right to determine which way to go next.
 		int iLeft = halfWay - 1;
@@ -177,8 +192,17 @@ int BetterBitonicSearch(const T& target, const Container& cont,
 
 		// we need to check the equality functions first, otherwise it might
 		// mess up a double comparison (for example) and start going the wrong way.
-		if (eqFunc(target, valLeft)) return iLeft;
-		if (eqFunc(target, valRight)) return iRight;
+		if (eqFunc(target, valLeft)) return returnLeftmost(iLeft);
+		if (eqFunc(target, valRight)) 
+		{
+			// stay faithful to our policy of returning left-most...
+			if (target < valLeft)
+			{
+				const int leftSearch = BinSearch(target, cont, begin, iLeft, eqFunc);
+				if (leftSearch != -1) return leftSearch;
+			}
+			return returnLeftmost(iRight);
+		}
 		
 		if (target > halfWayVal)
 		{
@@ -221,6 +245,7 @@ int BetterBitonicSearch(const T& target, const Container& cont,
 				if (valRight < halfWayVal)
 				{
 					// we've found a maximum midpoint; simply binsearch both directions!
+					// note that the binary search functions automatically return the left-most.
 					const int leftSearch = BinSearch(target, cont, begin, iLeft, eqFunc);
 					if (leftSearch != -1) return leftSearch;
 					return ReverseBinSearch(target, cont, iRight, end, eqFunc);

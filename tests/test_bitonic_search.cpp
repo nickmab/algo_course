@@ -92,17 +92,17 @@ TEST(BitonicSearchTest, TestDefaultCases)
 	// check the duplicates don't trip it up...
 	{
 		std::vector<int> v{1, 2, 3, 3, 3, 3, 3, 3, 3};
-		ASSERT_NE(nssearch::BitonicSearch<int>(3, v), -1);
+		ASSERT_EQ(nssearch::BitonicSearch<int>(3, v), 2);
 	}
 
 	{
 		std::vector<int> v{1, 2, 3, 3, 3, 3, 3, 3, 1};
-		ASSERT_NE(nssearch::BitonicSearch<int>(1, v), -1);
+		ASSERT_EQ(nssearch::BitonicSearch<int>(1, v), 0);
 	}
 
 	{
 		std::vector<int> v{2, 2, 3, 3, 3, 3, 3, 1};
-		ASSERT_NE(nssearch::BitonicSearch<int>(1, v), -1);
+		ASSERT_EQ(nssearch::BitonicSearch<int>(1, v), v.size()-1);
 	}
 
 	// test when the values aren't there...
@@ -126,7 +126,7 @@ TEST(BitonicSearchTest, TestCustomComparisonWithDoubles)
 
 	{
 		std::array<double, 6> a{1, 3.06, 3.05, 3.04, 2.4};
-		ASSERT_NE(nssearch::BitonicSearch<double>(3.05, a, func), -1);
+		ASSERT_EQ(nssearch::BitonicSearch<double>(3.05, a, func), 1);
 	}
 
 	{
@@ -177,17 +177,17 @@ TEST(BetterBitonicSearchTest, TestDefaultCases)
 	// check the duplicates don't trip it up...
 	{
 		std::vector<int> v{1, 2, 3, 3, 3, 3, 3, 3, 3};
-		ASSERT_NE(nssearch::BetterBitonicSearch<int>(3, v), -1);
+		ASSERT_EQ(nssearch::BetterBitonicSearch<int>(3, v), 2);
 	}
 
 	{
 		std::vector<int> v{1, 2, 3, 3, 3, 3, 3, 3, 1};
-		ASSERT_NE(nssearch::BetterBitonicSearch<int>(1, v), -1);
+		ASSERT_EQ(nssearch::BetterBitonicSearch<int>(1, v), 0);
 	}
 
 	{
 		std::vector<int> v{2, 2, 3, 3, 3, 3, 3, 1};
-		ASSERT_NE(nssearch::BetterBitonicSearch<int>(1, v), -1);
+		ASSERT_EQ(nssearch::BetterBitonicSearch<int>(1, v), v.size()-1);
 	}
 
 	// test when the values aren't there...
@@ -211,7 +211,7 @@ TEST(BetterBitonicSearchTest, TestCustomComparisonWithDoubles)
 
 	{
 		std::array<double, 6> a{1, 3.06, 3.05, 3.04, 2.4};
-		ASSERT_NE(nssearch::BetterBitonicSearch<double>(3.05, a, func), -1);
+		ASSERT_EQ(nssearch::BetterBitonicSearch<double>(3.05, a, func), 1);
 	}
 
 	{

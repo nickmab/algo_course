@@ -70,7 +70,7 @@ template <typename T, typename Container>
 int ReverseBinSearch(const T& target, const Container& cont, int begin, int end,
 	std::function<bool(T,T)> eqFunc=[](T a, T b)->bool{ return a == b; })
 {
-	return BinSearch<T,Container>(target, cont, begin, end, eqFunc, true);
+	return BinSearch(target, cont, begin, end, eqFunc, true);
 }
 
 } /* namespace search */

@@ -20,6 +20,8 @@ CUSTOM(IndexOutOfRange)
 CUSTOM(IllegalArgumentException)
 CUSTOM(UnexpectedMethodCall)
 CUSTOM(Unreachable)
+CUSTOM(EmptyContainer)
+CUSTOM(IllegalIteratorOp)
 
 #undef CUSTOM
 

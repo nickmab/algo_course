@@ -241,13 +241,13 @@ public:
 };
 
 template<typename T>
-typename Deque<T>::iterator typename Deque<T>::begin()
+typename Deque<T>::iterator Deque<T>::begin()
 {
 	return std::move(iterator(mFirstItem));
 }
 
 template<typename T>
-typename Deque<T>::iterator typename Deque<T>::end()
+typename Deque<T>::iterator Deque<T>::end()
 {
 	return std::move(iterator(mLastItem + 1, true));
 }

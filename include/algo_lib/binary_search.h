@@ -11,8 +11,9 @@ namespace mabz { namespace search {
 
 // Look for value "target" in already-sorted container "cont" specifically between 
 // container indices [begin, end] inclusive. Can optionally provide an equality 
-// comparison function (e.g. for comparing doubles), otherwise defaults 
-// to using == operator. Return -1 if not found.
+// comparison function, otherwise defaults to using == operator. 
+// Relies on the type supporting < and > comparison operators.
+// Return -1 if not found.
 // Returns the left-most index (if there are multiple instances of the same value).
 template <typename T, typename Container>
 int BinSearch(const T& target, const Container& cont, int begin, int end,
@@ -57,7 +58,7 @@ int BinSearch(const T& target, const Container& cont, int begin, int end,
 		else if (cmpFunc(halfwayVal,  target))
 		{
 			if (eqFunc(cont[begin], target)) return returnLeftmost(begin);
-			if (halfWay == begin) break;
+			if (halfWay == begin) return -1; // we've searched everything and failed.
 			++begin;
 			end = halfWay;
 		}

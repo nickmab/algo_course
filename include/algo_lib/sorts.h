@@ -39,10 +39,10 @@ int DutchFlagSort(Container& c)
 			if (inspectPosition > (leftRedPosition + 1))
 			{
 				// The colour of the incoming swapped cell must be white.
-				// If it were Blue, we'd have sent it forward. If it were left, we wouldn't 
-				// be looking at it in this swap check. It must be white.
-				// as such, we can safely increment the inspection counter forward
-				// without even bothering to check it!. 
+				// If it were Blue, we'd have sent it forward. If it were red, we wouldn't 
+				// be looking at it in this swap check - we don't re-check confirmed reds.
+				// It must be white. As such, we can safely increment the inspection 
+				// counter forward without even bothering to check it!
 				swap(inspectPosition, leftRedPosition + 1);
 			}
 			inspectPosition++;
